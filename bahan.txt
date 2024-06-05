@@ -1,0 +1,54 @@
+
+
+
+https://api.app.binaryedge.io/v2/user/login/
+
+
+HTTP/2 201
+date: Mon, 03 Jun 2024 01:00:11 GMT
+content-type: application/json
+content-length: 307
+allow: POST, OPTIONS
+x-frame-options: DENY
+x-content-type-options: nosniff
+x-content-type-options: nosniff
+referrer-policy: same-origin
+referrer-policy: strict-origin-when-cross-origin
+cross-origin-opener-policy: same-origin
+access-control-allow-origin: https://app.binaryedge.io
+access-control-allow-credentials: true
+access-control-allow-methods: GET, POST, OPTIONS, PUT, DELETE, PATCH
+access-control-allow-headers: DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,X-Token,External-ID,OTT,Coalition-App,x-datadog-trace-id,x-datadog-parent-id,x-datadog-origin,x-datadog-sampling-priority,x-datadog-sampled
+permissions-policy: microphone=(), geolocation=(), usb=(), payment=(), camera=()
+strict-transport-security: max-age=31536000
+content-security-policy: default-src 'self' https: wss:; style-src 'self' 'unsafe-inline' blob: https://use.typekit.net https://p.typekit.net https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://js.stripe.com https://www.google.com https://www.gstatic.com https://edge.fullstory.com https://maps.google.com https://maps.googleapis.com https://www.googletagmanager.com https://www.googleadservices.com https://www.google-analytics.com https://connect.facebook.net https://static.ads-twitter.com https://analytics.twitter.com https://googleads.g.doubleclick.net https://cdn.jsdelivr.net https://widget.intercom.io https://js.intercomcdn.com https://cdn.hellosign.com https://cdn.segment.com https://cdn.cookielaw.org https://snap.licdn.com https://ws.zoominfo.com https://grow.clearbitjs.com; img-src 'self' data: https://info.coalitioninc.com https://images.assets.prod.binaryedge.io https://prod-collections-riskportalapi-resolution-requests.s3.amazonaws.com https://resolution-requests.assets.prod.binaryedge.io https://s.gravatar.com https://mcusercontent.com https://d3f9qnon04ymh2.cloudfront.net https://d1ngxp4ef6grqi.cloudfront.net https://d3qx8u8yhl2krn.cloudfront.net https://be-resources.s3.eu-west-1.amazonaws.com https://images.ctfassets.net https://cdnjs.cloudflare.com https://static.intercomassets.com https://px4.ads.linkedin.com https://www.google.com https://maps.google.com https://maps.gstatic.com https://maps.googleapis.com https://www.google-analytics.com https://px.ads.linkedin.com https://www.facebook.com https://grow.clearbitjs.com https://t.co https://fastapi.tiangolo.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com https://js.intercomcdn.com https://secure.gravatar.com https://use.typekit.net; object-src 'self'; frame-src blob: https://www.google.com https://js.stripe.com https://app.hellosign.com https://player.vimeo.com https://coalitioninc.auth0.com https://*.binaryedge.io; frame-ancestors https://*.binaryedge.io https://*.coalitioninc.com https://*.thecoalition.com
+cf-cache-status: DYNAMIC
+server: cloudflare
+cf-ray: 88dbbeaaaf5a4739-SIN
+
+{"pk":1717376411,"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvdGN3dEBnbWFpbC5jb20iLCJpYXQiOjE3MTczNzY0MTEsImV4cCI6MTcxNzU0OTIxMSwianRpIjoiZThhYjIyNzItMThjYS00YjdmLTkyMmUtNTdkZGFjZjhlYmU5IiwidXNlcl9pZCI6ODkzMTAsIm9yaWdfaWF0IjoxNzE3Mzc2NDExfQ.o8VTSEzT19JYlFt21YmkgcZV2kFvcdmcxuqKazZ5YKw"}
+
+POST /v2/user/login/ HTTP/2
+host: api.app.binaryedge.io
+content-length: 53
+sec-ch-ua: "Not-A.Brand";v="99", "Chromium";v="124"
+accept: application/json, text/plain, */*
+content-type: application/json;charset=UTF-8
+sec-ch-ua-mobile: ?1
+user-agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36
+sec-ch-ua-platform: "Android"
+origin: https://app.binaryedge.io
+sec-fetch-site: same-site
+sec-fetch-mode: cors
+sec-fetch-dest: empty
+referer: https://app.binaryedge.io/
+accept-encoding: gzip, deflate, br
+accept-language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7
+
+{"email":"botcwt@gmail.com","password":"Dayanaji@12"}
+
+
+{
+  "pk": 1717376411,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvdGN3dEBnbWFpbC5jb20iLCJpYXQiOjE3MTczNzY0MTEsImV4cCI6MTcxNzU0OTIxMSwianRpIjoiZThhYjIyNzItMThjYS00YjdmLTkyMmUtNTdkZGFjZjhlYmU5IiwidXNlcl9pZCI6ODkzMTAsIm9yaWdfaWF0IjoxNzE3Mzc2NDExfQ.o8VTSEzT19JYlFt21YmkgcZV2kFvcdmcxuqKazZ5YKw"
+}

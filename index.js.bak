@@ -1,0 +1,253 @@
+const TelegramBot = require('node-telegram-bot-api');
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const { table } = require('table');
+
+// Bot token
+const token = '7356587031:AAGvGesBkSwXTE1NkA5YmjB9ZcozNjtp3Xc';
+
+// Inisialisasi bot
+const bot = new TelegramBot(token, { polling: true });
+
+// Fungsi untuk membaca data dari file JSON
+function readData(chatId) {
+    const storageDir = path.join(__dirname, 'storage', String(chatId));
+    const filePath = path.join(storageDir, 'data.json');
+
+    if (fs.existsSync(filePath)) {
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        return JSON.parse(fileContent);
+    }
+
+    return null;
+}
+
+// Fungsi untuk mengekstrak informasi IP, negara, dan AS dari data JSON
+function extractInfo(data) {
+    const extractedData = [];
+    const seenIPs = new Set();
+
+    data.forEach(event => {
+        const ip = event.ip;
+        const country = event.geoip.country_name;
+        const as_name = event.as_name;
+
+        if (ip && !seenIPs.has(ip)) {
+            seenIPs.add(ip);
+            extractedData.push({ ip, country, as_name });
+        }
+    });
+
+    return extractedData;
+}
+
+// Fungsi untuk mengirim pesan Telegram dengan format yang rapi
+async function kirimrapi(chatId, text) {
+    await bot.sendMessage(chatId, '\n```\n' + text + '\n```', { parse_mode: 'Markdown' });
+}
+
+// Fungsi untuk menyimpan email dan password ke dalam folder userdata
+function saveUserData(chatId, email, password) {
+    const userDataDir = path.join(__dirname, 'userdata', String(chatId));
+    if (!fs.existsSync(userDataDir)) {
+        fs.mkdirSync(userDataDir, { recursive: true });
+    }
+
+    const emailFilePath = path.join(userDataDir, `email_${chatId}.txt`);
+    fs.writeFileSync(emailFilePath, email);
+
+    const passwordFilePath = path.join(userDataDir, `password_${chatId}.txt`);
+    fs.writeFileSync(passwordFilePath, password);
+}
+
+// Fungsi untuk menghapus email dan password dari sistem
+function deleteUserData(chatId) {
+    const userDataDir = path.join(__dirname, 'userdata', String(chatId));
+    if (fs.existsSync(userDataDir)) {
+        try {
+            fs.rmSync(userDataDir, { recursive: true, force: true });
+            return true; // Berhasil menghapus
+        } catch (error) {
+            console.error("Gagal menghapus user data:", error);
+            return false; // Gagal menghapus
+        }
+    }
+    return false; // Tidak ada data pengguna
+}
+
+// Fungsi untuk membaca email dari file
+function readEmail(chatId) {
+    const emailFilePath = path.join(__dirname, 'userdata', String(chatId), `email_${chatId}.txt`);
+    if (fs.existsSync(emailFilePath)) {
+        return fs.readFileSync(emailFilePath, 'utf8').trim();
+    }
+    return null;
+}
+
+// Fungsi untuk membaca password dari file
+function readPassword(chatId) {
+    const passwordFilePath = path.join(__dirname, 'userdata', String(chatId), `password_${chatId}.txt`);
+    if (fs.existsSync(passwordFilePath)) {
+        return fs.readFileSync(passwordFilePath, 'utf8').trim();
+    }
+    return null;
+}
+
+// Fungsi untuk menyimpan cookie ke dalam file
+function saveCookie(chatId, cookie) {
+    const cookieFilePath = path.join(__dirname, 'userdata', String(chatId), `cookie_${chatId}.txt`);
+    fs.writeFileSync(cookieFilePath, cookie);
+}
+
+// Fungsi untuk membaca cookie dari file
+function readCookie(chatId) {
+    const cookieFilePath = path.join(__dirname, 'userdata', String(chatId), `cookie_${chatId}.txt`);
+    if (fs.existsSync(cookieFilePath)) {
+        return fs.readFileSync(cookieFilePath, 'utf8').trim();
+    }
+    return null;
+}
+
+async function POST(url, data) {
+    try {
+        const response = await axios.post(url, data, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Error posting to URL ${url}:`, error);
+        return null;
+    }
+}
+
+async function GET(url, cookie) {
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+                'authorization': cookie
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching URL ${url}:`, error);
+        return null;
+    }
+}
+
+// Fungsi untuk mengambil data dari beberapa halaman
+async function getDataFromPages(chatId, maxPage, cookie) {
+    const storageDir = path.join(__dirname, 'storage', String(chatId));
+    if (!fs.existsSync(storageDir)) {
+        fs.mkdirSync(storageDir, { recursive: true });
+    }
+
+    let allData = [];
+
+    for (let page = 1; page <= maxPage; page++) {
+        const getUrl = `https://api.app.binaryedge.io/v2/query/web/search?page=${page}&query=product:cloudflare%20&&%20port:443%20&&%20headers:%22CF-RAY%22%20&&%20headers:%22Content-Length:%20155%22%20&&%20response:%22HTTP/1.1%20400%20Bad%20Request%22`;
+        const response = await axios.get(getUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36', 'authorization': cookie } });
+
+        if (response && response.data) {
+            allData = allData.concat(response.data.events);
+            await bot.sendMessage(chatId, `Data dari Halaman ${page} berhasil diambil`);
+        } else {
+            await bot.sendMessage(chatId, `Gagal mengambil data dari Halaman ${page}`);
+        }
+    }
+
+    const filePath = path.join(storageDir, 'allData.json');
+    fs.writeFileSync(filePath, JSON.stringify(allData, null, 2));
+    await bot.sendMessage(chatId, `Semua data dari ${maxPage} halaman berhasil diambil dan disimpan!`);
+
+    const extractedData = extractInfo(allData);
+    await sendFormattedMessage(chatId, extractedData);
+}
+
+// Aksi ketika bot menerima pesan
+bot.on('message', async (msg) => {
+    const chatId = msg.chat.id;
+    const message = msg.text.toString().trim();
+    const userName = msg.from.username || msg.from.first_name || "Pengguna";
+
+    // Langkah 1: Simpan email dan password saat pengguna mengirimnya
+    if (message.startsWith('/start')) {
+        const email = readEmail(chatId);
+        if (email) {
+            const cookie = readCookie(chatId);
+            const limiturl = "https://api.app.binaryedge.io/v2/subscriptions/user/";
+            const limitku = await GET(limiturl, cookie);
+            const limitmu = JSON.stringify(limitku);
+            const data = JSON.parse(limitmu);
+            const requestsLeft = data.results[0].requests_left;
+
+            const welcome= `
+SELAMAT DATANG DI EDGE SCRAPE
+ 
+ • Username : ${userName}
+ • Email    : ${email}
+ • Limit Bulanan : ${requestsLeft}
+ 
+ INGPO
+ 
+ - /setakun xx@gmail.com@12345
+ - /hapusakun
+ - /getdata query
+ - /contohquery
+ - /atasilimit `;
+            await kirimrapi(chatId, welcome) 
+
+
+
+        } else {
+            await bot.sendMessage(chatId, 'Halo! Silakan kirimkan email dan password Anda dalam format:\nemail:password');
+        }
+    } else if (message.startsWith('/deleteData')) {
+        const success = deleteUserData(chatId);
+        if (success) {
+            await bot.sendMessage(chatId, 'Data email dan password Anda berhasil dihapus!');
+        } else {
+            await bot.sendMessage(chatId, 'Tidak ada data email dan password yang ditemukan.');
+        }
+    } else if (message.includes(':')) {
+        const [email, password] = message.split(':');
+        saveUserData(chatId, email, password);
+        // Langkah 2: Gunakan email dan password untuk login ke web
+        const postUrl = 'https://api.app.binaryedge.io/v2/user/login/';
+        
+        const postData = { email, password };
+        const postResponse = await POST(postUrl, postData);
+        console.log(postResponse);
+
+        if (postResponse && postResponse.token) {
+            const cookie = `JWT ${postResponse.token}`;
+            saveCookie(chatId, cookie);
+            await bot.sendMessage(chatId, 'Login berhasil!');
+            await bot.sendMessage(chatId, 'Sedang mengecek Limit!');
+            
+        } else {
+            await bot.sendMessage(chatId, 'Login gagal. Silakan coba lagi.');
+        }
+    } else if (message === '/getData') {
+        const email = readEmail(chatId);
+        const cookie = readCookie(chatId);
+
+        if (email && cookie) {
+            // Tentukan jumlah maksimal halaman yang akan diambil
+            const maxPage = 3; // Ubah sesuai kebutuhan
+            await getDataFromPages(chatId, maxPage, cookie);
+            const data = readData(chatId);
+            const extractedData = extractInfo(data);
+            await sendFormattedMessage(chatId, extractedData);
+        } else {
+            await bot.sendMessage(chatId, 'Silakan login terlebih dahulu dengan mengirim email dan password.');
+        }
+    }
+});
+
+
+
